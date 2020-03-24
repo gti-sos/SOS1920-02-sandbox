@@ -22,6 +22,19 @@ var tourism = [{
 	"averagestay": 2.7
 }];
 
+var copyTourism = tourism;
+
+//LOADINITIALDATA
+app.get("/tourism/loadInitialData", (req, res) => {
+
+	if(tourism == copyTourism){
+		res.sendStatus(409);
+	}else{
+		tourism = copyTourism
+		res.sendStatus(201);
+	}
+});
+
 //GET /tourism
 
 app.get("/tourism", (req,res)=>{
@@ -77,33 +90,61 @@ app.put("/tourism/:province", (req, res) =>{
 	var province = req.params.province;
     var updateTourism = req.body;
 	
-	tourism.find({ "province": province}).toArray((err, tourismArray) => {
-		if (err){
-            console.log(err);
-        }
-		if (tourismArray.length == 0) {
-    		console.log("PUT recurso no encontrado 404");
-        	res.sendStatus(404);
-			
-		}else if (!updateTourism.province || !updateTourism.year ||!updateTourism.traveller 
-				  || !updateTourism.overnightstay || !updateTourism.averagestay 
-				  || updateTourism.province != province
-				  || Object.keys(updateTourism).length != 5 ){
-            console.log("PUT recurso encontrado. Se intenta actualizar con campos no validos 400");
-            res.sendStatus(400);
-    
-        }else {
-        	tourism.updateOne({ "province": province}, { $set: updateTourism });
-            console.log("PUT realizado con exito");
-            res.sendStatus(200);
-
-        }
-	});	
+	filteredTourism = tourism.filter((t) => {
+		return (t.province != province);
+	});
+	
+	if(filteredTourism.length == 0){
+		res.sendStatus(404);
+	}
+	
+	if(province != updateTourism.province){
+		console.log("La provincia no puede ser modificada")
+		res.sendStatus(409);
+		return;
+	}
+	
+	if(!updateTourism.province || !updateTourism.year ||!updateTourism.traveller || !updateTourism.overnightstay
+	   || !updateTourism.averagestay ||updateTourism.province != province || Object.keys(updateTourism).length != 5 ){
+                console.log("PUT recurso encontrado. Se intenta actualizar con campos no validos 400");
+                res.sendStatus(400);
+		return;
+	}
+	
+	tourism = tourism.map((t) => {
+		if(t.province == updateTourism.province){
+			return updateTourism;
+		}else{
+			return t;
+		}
+		
+	});
+	res.sendStatus(200);
 });
 
-
-
-
+/*
+app.put(BASE_API_PATH+"/contacts/:name",(req,res)=>{
+    var name = req.params.name;
+    var contact = req.body;
+    
+    console.log(Date() + " - PUT /contacts/"+name);
+    
+    if(name != contact.name){
+        res.sendStatus(409);
+        console.warn(Date()+" - Hacking attempt!");
+        return;
+    }
+    
+    contacts = contacts.map((c)=>{
+        if(c.name == contact.name)
+            return contact;
+        else
+            return c;
+    });
+    
+    res.sendStatus(200);
+});
+*/
 
 //----------------------------------------------------------------------------------------------------------------------------//
 
