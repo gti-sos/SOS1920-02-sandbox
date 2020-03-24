@@ -12,14 +12,14 @@ var tourism = [{
 	"province": "almeria",
 	"year": 2015,
 	"traveller": 11260,
-	"overnight-stay":37406,
-	"average-stay": 3.3
+	"overnightstay":37406,
+	"averagestay": 3.3
 },{
 	"province": "cadiz",
 	"year": 2015,
 	"traveller": 28859,
-	"overnight-stay":77652,
-	"average-stay": 2.7
+	"overnightstay":77652,
+	"averagestay": 2.7
 }];
 
 //GET /tourism
@@ -68,6 +68,42 @@ app.get("/tourism/:province", (req,res)=>{
 	
 	res.sendStatus(200);
 })
+
+
+// PUT /tourism/XXX
+
+app.put("/tourism/:province", (req, res) =>{
+	
+	var province = req.params.province;
+    var updateTourism = req.body;
+	
+	tourism.find({ "province": province}).toArray((err, tourismArray) => {
+		if (err){
+            console.log(err);
+        }
+		if (tourismArray.length == 0) {
+    		console.log("PUT recurso no encontrado 404");
+        	res.sendStatus(404);
+			
+		}else if (!updateTourism.province || !updateTourism.year ||!updateTourism.traveller 
+				  || !updateTourism.overnightstay || !updateTourism.averagestay 
+				  || updateTourism.province != province
+				  || Object.keys(updateTourism).length != 5 ){
+            console.log("PUT recurso encontrado. Se intenta actualizar con campos no validos 400");
+            res.sendStatus(400);
+    
+        }else {
+        	tourism.updateOne({ "province": province}, { $set: updateTourism });
+            console.log("PUT realizado con exito");
+            res.sendStatus(200);
+
+        }
+	});	
+});
+
+
+
+
 
 //----------------------------------------------------------------------------------------------------------------------------//
 
