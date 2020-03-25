@@ -6,7 +6,11 @@ var port = process.env.PORT || 80;
 var app = express();
 app.use(bodyParser.json());
 
-//--------------------------------------RURAL-TOURISM-STATS-------------------------------------------------------------//
+const BASE_API_URL = "/api/v1";
+
+/*--------------------------------------------------------------*/
+/*----------------------------API MARTA-------------------------*/
+/*--------------------------------------------------------------*/
 
 var tourism = [{
 	"province": "almeria",
@@ -20,72 +24,101 @@ var tourism = [{
 	"traveller": 28859,
 	"overnightstay":77652,
 	"averagestay": 2.7
-}];
+},{
+	"province": "cordoba",
+	"year": 2015,
+	"traveller": 22365,
+	"overnightstay":76373,
+	"averagestay": 3.4
+},{
+	"province": "granada",
+	"year": 2015,
+	"traveller": 23873,
+	"overnightstay":67636,
+	"averagestay": 2.8
+},{
+	"province": "huelva",
+	"year": 2015,
+	"traveller": 40651,
+	"overnightstay":90601,
+	"averagestay": 2.2
+},{
+	"province": "jaen",
+	"year": 2015,
+	"traveller": 23513,
+	"overnightstay":63311,
+	"averagestay": 2
+},{
+	"province": "malaga",
+	"year": 2015,
+	"traveller": 56208,
+	"overnightstay":301760,
+	"averagestay": 5.4
+},{
+	"province": "sevilla",
+	"year": 2015,
+	"traveller": 22454,
+	"overnightstay":55880,
+	"averagestay": 2.5
+},];
 
 var copyTourism = tourism;
 
 //LOADINITIALDATA
-app.get("/tourism/loadInitialData", (req, res) => {
+app.get(BASE_API_URL + "/rural-tourism-stats/loadInitialData", (req, res) => {
 
-	if(tourism == copyTourism){
-		res.sendStatus(409);
+	if(tourism = []){
+		tourism = copyTourism;
 	}else{
-		tourism = copyTourism
-		res.sendStatus(201);
+		tourism = []
+		tourism = copyTourism;
 	}
-});
-
-//GET /tourism
-
-app.get("/tourism", (req,res)=>{
-	res.send(tourism);
-	
-});
-
-//POST /tourim
-
-app.post("/tourism", (req,res)=>{
-	
-	var newTourism = req.body;
-	
-	tourism.push(newTourism);
-	
 	res.sendStatus(201);
 });
 
-//DELETE /tourism
+//GET /rural-tourism-stats
 
-app.delete("/tourism", (req,res)=>{
-	
-	tourism = [];
-	
-	res.sendStatus(200);
+app.get(BASE_API_URL + "/rural-tourism-stats", (req,res)=>{
+	res.send(JSON.stringify(tourism,null,2));
+	//console.log("Data sent: " + JSON.stringify(tourism,null,2));
 });
 
-//GET /tourism/almeria
 
-app.get("/tourism/:province", (req,res)=>{
+//GET /rural-tourism-stats/XXX
+
+app.get(BASE_API_URL+"/rural-tourism-stats/:province", (req,res)=>{
 	
 	var province = req.params.province;
 	
-	var filteredTourism = tourism.filter((t)=>{
-		return t.province == province
-	})
+	var filteredTourism = tourism.filter((t) => {
+		return (t.province == province);
+	});
 	
-	if(filteredTourism.length >=1){
+	
+	if(filteredTourism.length >= 1){
 		res.send(filteredTourism[0]);
 	}else{
-		res.sendStatus(404);
+		res.sendStatus(404,"CONTACT NOT FOUND");
 	}
+});
+
+// POST /rural-tourism-stats
+
+app.post(BASE_API_URL+"/rural-tourism-stats",(req,res) =>{
 	
+	var newTourism = req.body;
 	
-	res.sendStatus(200);
-})
+	if((newTourism == "") || (newTourism.province == null)){
+		res.sendStatus(400,"BAD REQUEST");
+	} else {
+		tourism.push(newTourism); 	
+		res.sendStatus(201,"CREATED");
+	}
+});
 
+//PUT /rural-tourism-stats/XXX
 
-// PUT /tourism/XXX
-
-app.put("/tourism/:province", (req, res) =>{
+app.put(BASE_API_URL+"/rural-tourism-stats/:province", (req, res) =>{
 	
 	var province = req.params.province;
     var updateTourism = req.body;
@@ -96,6 +129,7 @@ app.put("/tourism/:province", (req, res) =>{
 	
 	if(filteredTourism.length == 0){
 		res.sendStatus(404);
+		return;
 	}
 	
 	if(province != updateTourism.province){
@@ -105,7 +139,7 @@ app.put("/tourism/:province", (req, res) =>{
 	}
 	
 	if(!updateTourism.province || !updateTourism.year ||!updateTourism.traveller || !updateTourism.overnightstay
-	   || !updateTourism.averagestay ||updateTourism.province != province || Object.keys(updateTourism).length != 5 ){
+	   || !updateTourism.averagestay){
                 console.log("PUT recurso encontrado. Se intenta actualizar con campos no validos 400");
                 res.sendStatus(400);
 		return;
@@ -122,31 +156,45 @@ app.put("/tourism/:province", (req, res) =>{
 	res.sendStatus(200);
 });
 
-/*
-app.put(BASE_API_PATH+"/contacts/:name",(req,res)=>{
-    var name = req.params.name;
-    var contact = req.body;
-    
-    console.log(Date() + " - PUT /contacts/"+name);
-    
-    if(name != contact.name){
-        res.sendStatus(409);
-        console.warn(Date()+" - Hacking attempt!");
-        return;
-    }
-    
-    contacts = contacts.map((c)=>{
-        if(c.name == contact.name)
-            return contact;
-        else
-            return c;
-    });
-    
-    res.sendStatus(200);
-});
-*/
+// DELETE /rural-tourism-stats
 
-//----------------------------------------------------------------------------------------------------------------------------//
+app.delete(BASE_API_URL + "/rural-tourism-stats", (req,res)=>{
+	
+	tourism = [];
+	
+	res.sendStatus(200);
+});
+
+// DELETE /rural-tourism-stats/XXX
+
+app.delete(BASE_API_URL+"/rural-tourism-stats/:province", (req,res)=>{
+	
+	var province = req.params.province;
+	
+	var filteredTourism = tourism.filter((t) => {
+		return (t.province != province);
+	});
+	
+	
+	if(filteredTourism.length < tourism.length){
+		tourism = filteredTourism;
+		res.sendStatus(200);
+	}else{
+		res.sendStatus(404,"TOURISM STAT NOT FOUND");
+	}
+	
+	
+});
+
+//POST incorrecto
+app.post(BASE_API_URL + "/rural-tourism-stats/:province", (req, res) => {
+    res.sendStatus(405);
+});
+
+//PUT incorrecto
+app.put(BASE_API_URL + "/rural-tourism-stats/", (req, res) => {
+    res.sendStatus(405);
+});
 
 
 
