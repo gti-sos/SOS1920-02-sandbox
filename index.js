@@ -1,9 +1,12 @@
 const express = require("express");
-var bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
 
 var port = process.env.PORT || 80;
 
 var app = express();
+
+
+app.use("/",express.static("./public"));
 app.use(bodyParser.json());
 
 const BASE_API_URL = "/api/v1";
@@ -62,6 +65,7 @@ var tourism = [{
 	"averagestay": 2.5
 },];
 
+var copyTourism = tourism;
 
 //LOADINITIALDATA
 app.get(BASE_API_URL + "/rural-tourism-stats/loadInitialData", (req, res) => {
@@ -128,7 +132,7 @@ app.put(BASE_API_URL+"/rural-tourism-stats/:province", (req, res) =>{
 	filteredTourism = tourism.filter((t) => {
 		return (t.province == province);
 	});
-	console.log("Data sent: " + JSON.stringify(filteredTourism,null,2));
+	//console.log("Data sent: " + JSON.stringify(filteredTourism,null,2));
 	if(filteredTourism.length == 0){
 		res.sendStatus(404);
 		return;
@@ -191,14 +195,3 @@ app.post(BASE_API_URL + "/rural-tourism-stats/:province", (req, res) => {
 app.put(BASE_API_URL + "/rural-tourism-stats/", (req, res) => {
     res.sendStatus(405);
 });
-
-
-
-app.use("/",express.static("./public"));
-
-
-app.listen(port, () => {
-	console.log("server ready");
-});
-
-console.log("Starting server... ");
