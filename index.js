@@ -65,8 +65,6 @@ var tourism = [{
 	"averagestay": 2.5
 },];
 
-var copyTourism = tourism;
-
 //LOADINITIALDATA
 app.get(BASE_API_URL + "/rural-tourism-stats/loadInitialData", (req, res) => {
 
@@ -104,6 +102,7 @@ app.get(BASE_API_URL+"/rural-tourism-stats/:province", (req,res)=>{
 	if(filteredTourism.length >= 1){
 		res.send(filteredTourism[0]);
 	}else{
+		console.log("No se encuentra la provincia");
 		res.sendStatus(404,"CONTACT NOT FOUND");
 	}
 });
@@ -116,9 +115,11 @@ app.post(BASE_API_URL+"/rural-tourism-stats",(req,res) =>{
 	
 	if((newTourism == "") || (newTourism.province == null)){
 		res.sendStatus(400,"BAD REQUEST");
+		console.log("La provincia está en blanco o no existe");
 	} else {
 		tourism.push(newTourism); 	
 		res.sendStatus(201,"CREATED");
+		console.log("Método POST, nuevo dato creado");
 	}
 });
 
@@ -195,3 +196,10 @@ app.post(BASE_API_URL + "/rural-tourism-stats/:province", (req, res) => {
 app.put(BASE_API_URL + "/rural-tourism-stats/", (req, res) => {
     res.sendStatus(405);
 });
+
+// CODIGO COMUN
+app.listen(port, () => {
+	console.log("server ready");
+});
+
+console.log("Starting server... ");
