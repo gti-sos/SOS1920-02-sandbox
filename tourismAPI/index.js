@@ -183,9 +183,10 @@ module.exports = function(app){
 
 	app.delete(BASE_API_URL + "/rural-tourism-stats", (req,res)=>{
 
-		db.remove({});
-
+		db.remove({},{multi:true});
+		
 		res.sendStatus(200);
+		console.log("Todos los recursos han sido eliminados");
 	});
 
 	// DELETE /rural-tourism-stats/XXX
