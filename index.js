@@ -1,16 +1,24 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const path = require("path");
-const tourismAPI =require(path.join(__dirname,"tourismAPI"));
+const backMarta = require("./src/back/tourismAPI/");
+const app = express();
+
+app.use(bodyParser.json());
 
 var port = process.env.PORT || 80;
 
-var app = express();
-app.use(bodyParser.json());
-
 app.use("/",express.static("./public"));
 
-tourismAPI(app);
+////////////////////////////
+////////API MARTA///////////
+////////////////////////////
+
+backMarta(app);
+
+
+
+
+
 
 app.listen(port, () => {
 	console.log("server ready");

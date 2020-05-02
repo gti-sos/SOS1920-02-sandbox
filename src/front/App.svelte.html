@@ -1,0 +1,21 @@
+<script>
+	import Router from 'svelte-spa-router';
+	import TourismTable from './TourismTable.svelte.html';
+	import EditTourism from './EditTourism.svelte.html';
+	
+	//import NotFound from './NotFound.svelte.html';
+	
+	const routes ={
+		"/": TourismTable,
+		"/rural-tourism-stats/:tourismProvince/tourismYear": EditTourism,
+		//"*": NotFound
+		
+	};
+	
+</script>
+
+<main>
+	<h1>Tourism Manager</h1>
+	<Router {routes}/>
+	
+</main>

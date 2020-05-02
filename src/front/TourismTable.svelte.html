@@ -1,0 +1,103 @@
+<script>
+    import {
+        onMount
+    } from "svelte";
+ 
+    import Table from "sveltestrap/src/Table.svelte";
+    import Button from "sveltestrap/src/Button.svelte";
+ 
+    let tourism = [];
+    let newTourism = {
+        province: "",
+        year: 0.0,
+        traveller: 0.0,
+		overnightstay: 0.0,
+		averagestay: 0.0
+		
+    };
+ 
+    onMount(getTourisms);
+ 
+    async function getTourisms() {
+ 
+        console.log("Fetching rural-tourism-stats...");
+        const res = await fetch("/api/v1/rural-tourism-stats");
+ 
+        if (res.ok) {
+            console.log("Ok:");
+            const json = await res.json();
+            contacts = json;
+            console.log("Received " + contacts.length + " rural-tourism-stats.");
+        } else {
+            console.log("ERROR!");
+        }
+    }
+ 
+    async function insertTourism() {
+ 
+        console.log("Inserting new data..." + JSON.stringify(newTourism));
+ 
+        const res = await fetch("/api/v1/rural-tourism-stats", {
+            method: "POST",
+            body: JSON.stringify(newTourism),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(function (res) {
+            getTourisms();
+        });
+ 
+    }
+    async function deleteTourism(province, year) {
+        const res = await fetch("/api/v1/rural-tourism-stats/" + province +"/" + year, {
+            method: "DELETE"
+        }).then(function (res) {
+            getTourisms();
+        });
+    }
+</script>
+ 
+<main>
+ 
+    {#await tourism}
+        Loading datas...
+    {:then tourism}
+        <Table bordered>
+            <thead>
+                <tr>
+                    <th>Province</th>
+                    <th>Year</th>
+                    <th>traveller</th>
+                    <th>overnightstay</th>
+					<th>averagestay</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input bind:value="{newTourism.province}"></td>
+                    <td><input bind:value="{newTourism.year}"></td>
+                    <td><input bind:value="{newTourism.traveller}"></td>
+                    <td><input bind:value="{newTourism.overnightstay}"></td>
+                    <td><input bind:value="{newTourism.averagestay}"></td>
+                    <td> <Button outline  color="primary" on:click={insertTourism}>Insert</Button> </td>
+                </tr>
+ 
+                {#each tourism as tou}
+                    <tr>
+						<td>
+                        	<a href="#/contact/{tou.province}/{tou.year}">{tou.province}</a>
+						</td>
+                        <td>{tou.year}</td>
+                        <td>{tou.traveller}</td>
+						<td>{tou.overnightstay}</td>
+                        <td>{tou.averagestay}</td>
+                        <td><Button outline color="danger" on:click="{deleteTourism(tou.province,tou.year)}">Delete</Button></td>
+                    </tr>
+                {/each}
+            </tbody>
+        </Table>
+    {/await}
+ 
+ 
+</main>
+
