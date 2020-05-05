@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const backMarta = require("./src/back/tourismAPI/");
+const backMarta1 = require("./src/back/tourismAPI/v1");
+const backMarta2 = require("./src/back/tourismAPI/v2");
 const app = express();
 
 app.use(bodyParser.json());
@@ -13,7 +14,8 @@ app.use("/",express.static("./public"));
 ////////API MARTA///////////
 ////////////////////////////
 
-backMarta(app);
+backMarta1(app);
+backMarta2(app);
 
 
 
